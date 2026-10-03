@@ -6,6 +6,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasma5support as P5Support
 import org.kde.kirigami as Kirigami
 import org.kde.taskmanager as TaskManager
+import org.kde.plasma.private.mpris as Mpris
 
 PlasmoidItem {
     id: root
@@ -129,6 +130,14 @@ PlasmoidItem {
     }
 
     TaskManager.VirtualDesktopInfo { id: desktops }
+    Mpris.Mpris2Model { id: mpris }
+
+    // MPRIS times are in microseconds.
+    function mediaTime(us) {
+        const t = Math.max(0, Math.floor((us || 0) / 1e6));
+        const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), sec = String(t % 60).padStart(2, "0");
+        return h ? h + ":" + String(m).padStart(2, "0") + ":" + sec : m + ":" + sec;
+    }
     TaskManager.ActivityInfo { id: activities }
 
     fullRepresentation: Item {
@@ -300,6 +309,7 @@ PlasmoidItem {
 
             // ---- virtual desktops ------------------------------------
             Row {
+                id: desktopRow
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: root.px(14)
                 visible: root.cfg.showDesktops
@@ -422,6 +432,219 @@ PlasmoidItem {
                                 onClicked: root.switchDesktop(index)
                             }
                         }
+                    }
+                }
+            }
+
+            // ---- now playing -----------------------------------------
+            Rectangle {
+                id: nowPlaying
+                readonly property var player: mpris.currentPlayer
+                readonly property bool playing: player !== null && player.playbackStatus === Mpris.PlaybackStatus.Playing
+                readonly property bool hasTrack: player !== null && player.track !== ""
+
+                Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: root.px(10)
+                // Line up with the desktop cards above when they're shown.
+                Layout.preferredWidth: root.cfg.showDesktops ? Math.max(desktopRow.implicitWidth, root.px(360)) : root.px(420)
+                implicitHeight: npRow.implicitHeight + root.px(20)
+                visible: root.cfg.showNowPlaying && hasTrack && (playing || !root.cfg.hideWhenPaused)
+                radius: root.px(12)
+                color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, root.cfg.cardOpacity / 100)
+                border.width: 1
+                border.color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.12)
+
+                // Players only report their position on request, so poll while playing.
+                Timer {
+                    interval: 1000
+                    repeat: true
+                    running: nowPlaying.visible && nowPlaying.playing
+                    onTriggered: nowPlaying.player.updatePosition()
+                }
+
+                RowLayout {
+                    id: npRow
+                    anchors.fill: parent
+                    anchors.margins: root.px(10)
+                    spacing: root.px(12)
+
+                    // Cover art; click to bring the player to the front.
+                    Item {
+                        visible: root.cfg.showAlbumArt
+                        implicitWidth: root.px(56)
+                        implicitHeight: root.px(56)
+                        Layout.minimumWidth: implicitWidth
+                        Rectangle {
+                            id: artMask
+                            anchors.fill: parent
+                            radius: root.px(8)
+                            color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.1)
+                            layer.enabled: true
+                            visible: false
+                        }
+                        Image {
+                            id: art
+                            anchors.fill: parent
+                            source: nowPlaying.player ? nowPlaying.player.artUrl : ""
+                            fillMode: Image.PreserveAspectCrop
+                            sourceSize: Qt.size(width * 2, height * 2)
+                            asynchronous: true
+                            visible: false
+                        }
+                        MultiEffect {
+                            anchors.fill: parent
+                            source: art
+                            maskEnabled: true
+                            maskSource: artMask
+                            visible: art.status === Image.Ready
+                        }
+                        Kirigami.Icon {
+                            anchors.centerIn: parent
+                            width: parent.width * 0.6
+                            height: width
+                            visible: art.status !== Image.Ready
+                            source: nowPlaying.player ? (nowPlaying.player.iconName || "media-default-album") : ""
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: if (nowPlaying.player && nowPlaying.player.canRaise) nowPlaying.player.Raise()
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        spacing: root.px(2)
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: nowPlaying.player ? nowPlaying.player.track : ""
+                            color: root.fg
+                            elide: Text.ElideRight
+                            font.pixelSize: root.px(14)
+                            font.weight: Font.DemiBold
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: nowPlaying.player ? [nowPlaying.player.artist, nowPlaying.player.album].filter(x => x).join(" — ") : ""
+                            color: root.fgDim
+                            elide: Text.ElideRight
+                            font.pixelSize: root.px(12)
+                        }
+
+                        // Progress; click to seek when the player allows it.
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.topMargin: root.px(4)
+                            visible: root.cfg.showProgress && nowPlaying.player !== null && nowPlaying.player.length > 0
+                            spacing: root.px(8)
+
+                            Text {
+                                text: root.mediaTime(nowPlaying.player ? nowPlaying.player.position : 0)
+                                color: root.fgDim
+                                font.pixelSize: root.px(10)
+                                font.features: { "tnum": 1 }
+                            }
+                            Rectangle {
+                                id: track
+                                Layout.fillWidth: true
+                                implicitHeight: root.px(4)
+                                radius: height / 2
+                                color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.18)
+                                Rectangle {
+                                    height: parent.height
+                                    radius: parent.radius
+                                    color: Kirigami.Theme.highlightColor
+                                    width: nowPlaying.player && nowPlaying.player.length > 0
+                                           ? parent.width * Math.min(1, nowPlaying.player.position / nowPlaying.player.length) : 0
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    anchors.margins: -root.px(6)
+                                    enabled: nowPlaying.player !== null && nowPlaying.player.canSeek
+                                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    onClicked: mouse => {
+                                        const p = nowPlaying.player;
+                                        const target = Math.max(0, Math.min(1, (mouse.x - root.px(6)) / track.width)) * p.length;
+                                        p.Seek(Math.round(target - p.position));
+                                    }
+                                }
+                            }
+                            Text {
+                                text: root.mediaTime(nowPlaying.player ? nowPlaying.player.length : 0)
+                                color: root.fgDim
+                                font.pixelSize: root.px(10)
+                                font.features: { "tnum": 1 }
+                            }
+                        }
+                    }
+
+                    // Transport controls
+                    Row {
+                        spacing: root.px(2)
+                        Repeater {
+                            model: [
+                                { icon: "media-skip-backward", action: "prev" },
+                                { icon: nowPlaying.playing ? "media-playback-pause" : "media-playback-start", action: "toggle" },
+                                { icon: "media-skip-forward", action: "next" }
+                            ]
+                            Rectangle {
+                                readonly property bool main: modelData.action === "toggle"
+                                readonly property bool can: {
+                                    const p = nowPlaying.player;
+                                    if (!p) return false;
+                                    if (modelData.action === "prev") return p.canGoPrevious;
+                                    if (modelData.action === "next") return p.canGoNext;
+                                    return p.canPlay || p.canPause;
+                                }
+                                width: root.px(main ? 40 : 32)
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                radius: width / 2
+                                opacity: can ? 1 : 0.35
+                                color: btn.containsMouse && can ? Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.15)
+                                                                : main ? Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.08) : "transparent"
+                                Kirigami.Icon {
+                                    anchors.centerIn: parent
+                                    width: parent.width * 0.55
+                                    height: width
+                                    source: modelData.icon
+                                    color: root.fg
+                                    isMask: true
+                                }
+                                MouseArea {
+                                    id: btn
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    enabled: parent.can
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        const p = nowPlaying.player;
+                                        if (modelData.action === "prev") p.Previous();
+                                        else if (modelData.action === "next") p.Next();
+                                        else p.PlayPause();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                PlasmaCore.ToolTipArea {
+                    // Behind the controls, so it only shows when hovering the text area.
+                    z: -1
+                    anchors.fill: parent
+                    textFormat: Text.PlainText
+                    mainText: nowPlaying.player ? nowPlaying.player.track : ""
+                    subText: {
+                        const p = nowPlaying.player;
+                        if (!p) return "";
+                        const lines = [];
+                        if (p.artist) lines.push(i18n("Artist: %1", p.artist));
+                        if (p.album) lines.push(i18n("Album: %1", p.album));
+                        lines.push(i18n("Playing in %1", p.identity));
+                        return lines.join("\n");
                     }
                 }
             }

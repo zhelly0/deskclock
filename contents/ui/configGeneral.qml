@@ -23,6 +23,10 @@ KCM.SimpleKCM {
     property alias cfg_showStickyApps: showStickyApps.checked
     property alias cfg_maxIcons: maxIcons.value
     property alias cfg_iconSize: iconSize.value
+    property alias cfg_showNowPlaying: showNowPlaying.checked
+    property alias cfg_hideWhenPaused: hideWhenPaused.checked
+    property alias cfg_showAlbumArt: showAlbumArt.checked
+    property alias cfg_showProgress: showProgress.checked
     property alias cfg_scale: scaleCtl.value
     property alias cfg_useThemeColor: useThemeColor.checked
     property alias cfg_textColor: textColor.color
@@ -182,6 +186,12 @@ KCM.SimpleKCM {
         QQC2.CheckBox { id: showStickyApps; text: i18n("Apps pinned to all desktops"); enabled: showDesktops.checked }
         SliderRow { id: maxIcons; Kirigami.FormData.label: i18n("Max icons per desktop:"); from: 1; to: 12; stepSize: 1; enabled: showDesktops.checked }
         SliderRow { id: iconSize; Kirigami.FormData.label: i18n("Icon size:"); from: 16; to: 48; stepSize: 2; suffix: " px"; enabled: showDesktops.checked }
+
+        Kirigami.Separator { Kirigami.FormData.isSection: true; Kirigami.FormData.label: i18n("Now playing") }
+        QQC2.CheckBox { id: showNowPlaying; Kirigami.FormData.label: i18n("Show:"); text: i18n("Current media (Spotify, browsers, …)") }
+        QQC2.CheckBox { id: showAlbumArt; text: i18n("Album art"); enabled: showNowPlaying.checked }
+        QQC2.CheckBox { id: showProgress; text: i18n("Progress bar"); enabled: showNowPlaying.checked }
+        QQC2.CheckBox { id: hideWhenPaused; text: i18n("Hide when paused or stopped"); enabled: showNowPlaying.checked }
 
         Kirigami.Separator { Kirigami.FormData.isSection: true; Kirigami.FormData.label: i18n("Appearance") }
         SliderRow { id: scaleCtl; Kirigami.FormData.label: i18n("Size:"); from: 50; to: 200; stepSize: 5; suffix: " %" }

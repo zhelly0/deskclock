@@ -25,6 +25,12 @@
     <entry name="maxIcons" type="Int"><default>6</default></entry>
     <entry name="iconSize" type="Int"><default>22</default></entry>
   </group>
+  <group name="NowPlaying">
+    <entry name="showNowPlaying" type="Bool"><default>true</default></entry>
+    <entry name="hideWhenPaused" type="Bool"><default>false</default></entry>
+    <entry name="showAlbumArt" type="Bool"><default>true</default></entry>
+    <entry name="showProgress" type="Bool"><default>true</default></entry>
+  </group>
   <group name="Appearance">
     <entry name="scale" type="Int"><default>100</default></entry>
     <entry name="useThemeColor" type="Bool"><default>true</default></entry>
