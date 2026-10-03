@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "zhelly0" }],
+        "Category": "Date and Time",
+        "Description": "Background-free clock with outdoor temperature and a virtual desktop overview",
+        "Icon": "preferences-system-time",
+        "Id": "com.github.zhelly0.deskclock",
+        "License": "GPL-3.0",
+        "Name": "DeskClock",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

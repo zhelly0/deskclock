@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="Clock">
+    <entry name="use24h" type="Bool"><default>true</default></entry>
+    <entry name="showSeconds" type="Bool"><default>false</default></entry>
+    <entry name="showDate" type="Bool"><default>true</default></entry>
+  </group>
+  <group name="Weather">
+    <entry name="showWeather" type="Bool"><default>true</default></entry>
+    <!-- Chosen via the place search in the settings. -->
+    <entry name="city" type="String"><default>Stockholm</default></entry>
+    <entry name="cityDetail" type="String"><default>Stockholm County, Sweden</default></entry>
+    <entry name="latitude" type="Double"><default>59.32938</default></entry>
+    <entry name="longitude" type="Double"><default>18.06871</default></entry>
+    <entry name="fahrenheit" type="Bool"><default>false</default></entry>
+    <entry name="showCity" type="Bool"><default>false</default></entry>
+  </group>
+  <group name="Desktops">
+    <entry name="showDesktops" type="Bool"><default>true</default></entry>
+    <entry name="showDesktopNames" type="Bool"><default>true</default></entry>
+    <entry name="showStickyApps" type="Bool"><default>false</default></entry>
+    <entry name="maxIcons" type="Int"><default>6</default></entry>
+    <entry name="iconSize" type="Int"><default>22</default></entry>
+  </group>
+  <group name="Appearance">
+    <entry name="scale" type="Int"><default>100</default></entry>
+    <entry name="useThemeColor" type="Bool"><default>true</default></entry>
+    <entry name="textColor" type="Color"><default>#ffffff</default></entry>
+    <entry name="shadow" type="Bool"><default>true</default></entry>
+    <entry name="cardOpacity" type="Int"><default>8</default></entry>
+    <entry name="autoCenter" type="Bool"><default>true</default></entry>
+    <entry name="autoCenterVertical" type="Bool"><default>false</default></entry>
+  </group>
+</kcfg>
