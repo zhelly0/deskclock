@@ -31,11 +31,18 @@ PlasmoidItem {
     // ---- glass (blurred wallpaper behind tiles/cards) --------------------
     readonly property bool glassOn: cfg.glassStyle > 0
     readonly property real glassBlur: cfg.glassStrength / 100
-    // "Vivid" approximates KWin's background contrast effect on panels.
+    // "Vivid" boosts the colours showing through.
     readonly property real glassSaturation: cfg.glassStyle === 2 ? 0.45 : 0
-    readonly property real glassBrightness: cfg.glassStyle === 2 ? 0.04 : 0
+    readonly property real glassBrightness: 0
+    // Same recipe as the Glass Panel theme: a dark tint keeps light text
+    // readable even over a bright wallpaper.
+    readonly property color glassTint: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g,
+                                               Kirigami.Theme.backgroundColor.b, cfg.glassTint / 100)
 
     function cardFill(extra) {
+        // Glass: the dark tint, lightened a little on hover / for the current desktop.
+        if (glassOn && !panelCards)
+            return Kirigami.ColorUtils.tintWithAlpha(glassTint, fg, extra / 100);
         // With taskbar-style cards only hover/current add a light overlay.
         const base = panelCards ? 0 : cfg.cardOpacity;
         return Qt.rgba(fg.r, fg.g, fg.b, (base + extra) / 100);

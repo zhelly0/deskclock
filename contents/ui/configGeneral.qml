@@ -35,6 +35,7 @@ KCM.SimpleKCM {
     property alias cfg_cardStyle: cardStyle.currentIndex
     property alias cfg_glassStyle: glassStyle.currentIndex
     property alias cfg_glassStrength: glassStrength.value
+    property alias cfg_glassTint: glassTint.value
     property alias cfg_autoCenter: autoCenter.checked
     property alias cfg_autoCenterVertical: autoCenterVertical.checked
 
@@ -206,6 +207,7 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Glass:")
             model: [i18n("Off"), i18n("Frosted"), i18n("Frosted vivid (like the taskbar)")]
         }
+        SliderRow { id: glassTint; Kirigami.FormData.label: i18n("Glass tint:"); from: 0; to: 90; stepSize: 5; suffix: " %"; enabled: glassStyle.currentIndex > 0 }
         SliderRow { id: glassStrength; Kirigami.FormData.label: i18n("Blur strength:"); from: 10; to: 100; stepSize: 5; suffix: " %"; enabled: glassStyle.currentIndex > 0 }
         QQC2.ComboBox {
             id: cardStyle
