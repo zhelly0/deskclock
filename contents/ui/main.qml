@@ -33,7 +33,6 @@ PlasmoidItem {
     readonly property real glassBlur: cfg.glassStrength / 100
     // "Vivid" boosts the colours showing through.
     readonly property real glassSaturation: cfg.glassStyle === 2 ? 0.45 : 0
-    readonly property real glassBrightness: 0
     // Same recipe as the Glass Panel theme: a dark tint keeps light text
     // readable even over a bright wallpaper.
     readonly property color glassTint: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g,
@@ -396,7 +395,6 @@ PlasmoidItem {
                             radius: parent.radius
                             blurAmount: root.glassBlur
                             saturation: root.glassSaturation
-                            brightness: root.glassBrightness
                         }
                         KSvg.FrameSvgItem {
                             anchors.fill: parent
@@ -534,7 +532,6 @@ PlasmoidItem {
                     radius: parent.radius
                     blurAmount: root.glassBlur
                     saturation: root.glassSaturation
-                    brightness: root.glassBrightness
                 }
                 KSvg.FrameSvgItem {
                     anchors.fill: parent

@@ -30,8 +30,9 @@ Right-click the widget → **Configure DeskClock…**
 - **Virtual desktops:** names or numbers, include apps pinned to all desktops,
   max icons per desktop, icon size
 - **Now playing:** show/hide, album art, progress bar, hide when paused
-- **Appearance:** size, text color, drop shadow, desktop card tint, and
-  automatic horizontal/vertical centering
+- **Appearance:** size, text color, drop shadow, glass (off / frosted /
+  frosted vivid, blur strength, tint), card style (tint / match taskbar) and
+  tint, and automatic horizontal/vertical centering
 
 ## Privacy
 
