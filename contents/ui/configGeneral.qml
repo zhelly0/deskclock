@@ -32,6 +32,7 @@ KCM.SimpleKCM {
     property alias cfg_textColor: textColor.color
     property alias cfg_shadow: shadow.checked
     property alias cfg_cardOpacity: cardOpacity.value
+    property alias cfg_cardStyle: cardStyle.currentIndex
     property alias cfg_autoCenter: autoCenter.checked
     property alias cfg_autoCenterVertical: autoCenterVertical.checked
 
@@ -198,7 +199,12 @@ KCM.SimpleKCM {
         QQC2.CheckBox { id: useThemeColor; Kirigami.FormData.label: i18n("Text color:"); text: i18n("Follow the color scheme") }
         KQuickControls.ColorButton { id: textColor; enabled: !useThemeColor.checked }
         QQC2.CheckBox { id: shadow; text: i18n("Drop shadow for readability") }
-        SliderRow { id: cardOpacity; Kirigami.FormData.label: i18n("Desktop card tint:"); from: 0; to: 30; stepSize: 1; suffix: " %" }
+        QQC2.ComboBox {
+            id: cardStyle
+            Kirigami.FormData.label: i18n("Card style:")
+            model: [i18n("Match taskbar"), i18n("Tint")]
+        }
+        SliderRow { id: cardOpacity; Kirigami.FormData.label: i18n("Card tint:"); from: 0; to: 30; stepSize: 1; suffix: " %"; enabled: cardStyle.currentIndex === 1 }
         QQC2.CheckBox { id: autoCenter; Kirigami.FormData.label: i18n("Position:"); text: i18n("Center horizontally on the screen") }
         QQC2.CheckBox { id: autoCenterVertical; text: i18n("Center vertically on the screen") }
         QQC2.Label {

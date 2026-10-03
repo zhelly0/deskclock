@@ -36,6 +36,8 @@
     <entry name="useThemeColor" type="Bool"><default>true</default></entry>
     <entry name="textColor" type="Color"><default>#ffffff</default></entry>
     <entry name="shadow" type="Bool"><default>true</default></entry>
+    <!-- 0 = match taskbar, 1 = tint -->
+    <entry name="cardStyle" type="Int"><default>1</default></entry>
     <entry name="cardOpacity" type="Int"><default>8</default></entry>
     <entry name="autoCenter" type="Bool"><default>true</default></entry>
     <entry name="autoCenterVertical" type="Bool"><default>false</default></entry>

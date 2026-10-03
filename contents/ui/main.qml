@@ -7,6 +7,7 @@ import org.kde.plasma.plasma5support as P5Support
 import org.kde.kirigami as Kirigami
 import org.kde.taskmanager as TaskManager
 import org.kde.plasma.private.mpris as Mpris
+import org.kde.ksvg as KSvg
 
 PlasmoidItem {
     id: root
@@ -24,6 +25,14 @@ PlasmoidItem {
     preferredRepresentation: fullRepresentation
 
     function px(n) { return Math.round(n * s); }
+
+    // cardStyle 0 = the taskbar's own background graphics, 1 = translucent tint.
+    readonly property bool panelCards: cfg.cardStyle === 0
+    function cardFill(extra) {
+        // With taskbar-style cards only hover/current add a light overlay.
+        const base = panelCards ? 0 : cfg.cardOpacity;
+        return Qt.rgba(fg.r, fg.g, fg.b, (base + extra) / 100);
+    }
 
     // WMO weather code -> freedesktop weather icon name.
     function weatherIcon(code, day) {
@@ -360,12 +369,18 @@ PlasmoidItem {
 
                         width: Math.max(root.px(110), cardBody.implicitWidth + root.px(24))
                         height: cardBody.implicitHeight + root.px(18)
-                        radius: root.px(12)
-                        color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b,
-                                       (root.cfg.cardOpacity + (hover.containsMouse ? 6 : 0) + (current ? 6 : 0)) / 100)
-                        border.width: current ? 2 : 1
+                        radius: root.panelCards ? 4 : root.px(12)
+                        color: root.cardFill((hover.containsMouse ? 6 : 0) + (current ? 6 : 0))
+                        border.width: current ? 2 : (root.panelCards ? 0 : 1)
                         border.color: current ? Kirigami.Theme.highlightColor
                                               : Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.12)
+
+                        KSvg.FrameSvgItem {
+                            anchors.fill: parent
+                            z: -1
+                            visible: root.panelCards
+                            imagePath: "widgets/panel-background"
+                        }
 
                         TaskManager.TasksModel {
                             id: tasks
@@ -484,10 +499,17 @@ PlasmoidItem {
                 Layout.preferredWidth: root.cfg.showDesktops ? Math.max(desktopRow.implicitWidth, root.px(360)) : root.px(420)
                 implicitHeight: npRow.implicitHeight + root.px(20)
                 visible: root.cfg.showNowPlaying && hasTrack && (playing || !root.cfg.hideWhenPaused)
-                radius: root.px(12)
-                color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, root.cfg.cardOpacity / 100)
-                border.width: 1
+                radius: root.panelCards ? 4 : root.px(12)
+                color: root.cardFill(0)
+                border.width: root.panelCards ? 0 : 1
                 border.color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.12)
+
+                KSvg.FrameSvgItem {
+                    anchors.fill: parent
+                    z: -1
+                    visible: root.panelCards
+                    imagePath: "widgets/panel-background"
+                }
 
                 // Players only report their position on request, so poll while playing.
                 Timer {
