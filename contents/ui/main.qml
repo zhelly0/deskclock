@@ -132,6 +132,41 @@ PlasmoidItem {
     TaskManager.VirtualDesktopInfo { id: desktops }
     Mpris.Mpris2Model { id: mpris }
 
+    // Row 0 of the model is Plasma's "automatic" multiplexer entry, but the
+    // player object it exposes can stay stuck on whichever player was active
+    // when the widget started. Track the real players and pick one ourselves:
+    // the most recently started one wins, and stays while paused unless
+    // another player is playing.
+    property var activePlayer: null
+
+    function choosePlayer() {
+        const list = [];
+        for (let i = 0; i < playerList.count; i++) {
+            const o = playerList.objectAt(i);
+            if (o && o.container && (o.index > 0 || playerList.count === 1)) list.push(o.container);
+        }
+        const playing = list.filter(p => p.playbackStatus === Mpris.PlaybackStatus.Playing);
+        const cur = activePlayer;
+        if (cur && list.includes(cur) && (cur.playbackStatus === Mpris.PlaybackStatus.Playing || playing.length === 0)) return;
+        activePlayer = playing[0] || list.find(p => p.track) || null;
+    }
+
+    Instantiator {
+        id: playerList
+        model: mpris
+        delegate: QtObject {
+            required property int index
+            required property var container
+            readonly property int status: container ? container.playbackStatus : 0
+            onStatusChanged: {
+                if (status === Mpris.PlaybackStatus.Playing && index > 0) root.activePlayer = container;
+                else Qt.callLater(root.choosePlayer);
+            }
+        }
+        onObjectAdded: Qt.callLater(root.choosePlayer)
+        onObjectRemoved: Qt.callLater(root.choosePlayer)
+    }
+
     // MPRIS times are in microseconds.
     function mediaTime(us) {
         const t = Math.max(0, Math.floor((us || 0) / 1e6));
@@ -439,7 +474,7 @@ PlasmoidItem {
             // ---- now playing -----------------------------------------
             Rectangle {
                 id: nowPlaying
-                readonly property var player: mpris.currentPlayer
+                readonly property var player: root.activePlayer
                 readonly property bool playing: player !== null && player.playbackStatus === Mpris.PlaybackStatus.Playing
                 readonly property bool hasTrack: player !== null && player.track !== ""
 
