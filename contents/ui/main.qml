@@ -28,6 +28,13 @@ PlasmoidItem {
 
     // cardStyle 0 = the taskbar's own background graphics, 1 = translucent tint.
     readonly property bool panelCards: cfg.cardStyle === 0
+    // ---- glass (blurred wallpaper behind tiles/cards) --------------------
+    readonly property bool glassOn: cfg.glassStyle > 0
+    readonly property real glassBlur: cfg.glassStrength / 100
+    // "Vivid" approximates KWin's background contrast effect on panels.
+    readonly property real glassSaturation: cfg.glassStyle === 2 ? 0.45 : 0
+    readonly property real glassBrightness: cfg.glassStyle === 2 ? 0.04 : 0
+
     function cardFill(extra) {
         // With taskbar-style cards only hover/current add a light overlay.
         const base = panelCards ? 0 : cfg.cardOpacity;
@@ -375,6 +382,15 @@ PlasmoidItem {
                         border.color: current ? Kirigami.Theme.highlightColor
                                               : Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.12)
 
+                        GlassBackdrop {
+                            anchors.fill: parent
+                            z: -2
+                            visible: root.glassOn
+                            radius: parent.radius
+                            blurAmount: root.glassBlur
+                            saturation: root.glassSaturation
+                            brightness: root.glassBrightness
+                        }
                         KSvg.FrameSvgItem {
                             anchors.fill: parent
                             z: -1
@@ -504,6 +520,15 @@ PlasmoidItem {
                 border.width: root.panelCards ? 0 : 1
                 border.color: Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.12)
 
+                GlassBackdrop {
+                    anchors.fill: parent
+                    z: -2
+                    visible: root.glassOn
+                    radius: parent.radius
+                    blurAmount: root.glassBlur
+                    saturation: root.glassSaturation
+                    brightness: root.glassBrightness
+                }
                 KSvg.FrameSvgItem {
                     anchors.fill: parent
                     z: -1

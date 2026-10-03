@@ -6,6 +6,7 @@ showing which apps are open on each, and the currently playing media.
 
 ![DeskClock on a Plasma desktop](docs/screenshot.png)
 
+- Optional frosted-glass tiles/cards: the wallpaper behind them is blurred (Off / Frosted / Frosted vivid, with a strength slider)
 - Large clock (12/24 h, optional seconds) and localized date
 - Current outdoor temperature and conditions from [Open-Meteo](https://open-meteo.com) (free, no account or API key)
 - One card per virtual desktop with the icons of the apps on it; click to switch

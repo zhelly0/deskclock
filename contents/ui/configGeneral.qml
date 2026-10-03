@@ -33,6 +33,8 @@ KCM.SimpleKCM {
     property alias cfg_shadow: shadow.checked
     property alias cfg_cardOpacity: cardOpacity.value
     property alias cfg_cardStyle: cardStyle.currentIndex
+    property alias cfg_glassStyle: glassStyle.currentIndex
+    property alias cfg_glassStrength: glassStrength.value
     property alias cfg_autoCenter: autoCenter.checked
     property alias cfg_autoCenterVertical: autoCenterVertical.checked
 
@@ -199,6 +201,12 @@ KCM.SimpleKCM {
         QQC2.CheckBox { id: useThemeColor; Kirigami.FormData.label: i18n("Text color:"); text: i18n("Follow the color scheme") }
         KQuickControls.ColorButton { id: textColor; enabled: !useThemeColor.checked }
         QQC2.CheckBox { id: shadow; text: i18n("Drop shadow for readability") }
+        QQC2.ComboBox {
+            id: glassStyle
+            Kirigami.FormData.label: i18n("Glass:")
+            model: [i18n("Off"), i18n("Frosted"), i18n("Frosted vivid (like the taskbar)")]
+        }
+        SliderRow { id: glassStrength; Kirigami.FormData.label: i18n("Blur strength:"); from: 10; to: 100; stepSize: 5; suffix: " %"; enabled: glassStyle.currentIndex > 0 }
         QQC2.ComboBox {
             id: cardStyle
             Kirigami.FormData.label: i18n("Card style:")
